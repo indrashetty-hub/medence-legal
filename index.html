@@ -135,7 +135,7 @@
     }
     .nav-link {
       position: relative;
-      color: rgba(55,65,81,0.7);
+      color: #374151;
       transition: color 0.2s;
     }
     .nav-link:hover { color: #111827; }
@@ -551,6 +551,64 @@
     /* Pricing card hover — override inline for Standard */
     .pricing-card { transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease, background 0.35s ease, border-color 0.35s ease; }
 
+    /* ── Process card animations ──────────────────────────── */
+
+    /* Shimmer sweep on hover */
+    .process-card {
+      position: relative;
+      transition: box-shadow 0.35s ease, border-color 0.35s ease;
+    }
+    .process-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        105deg,
+        transparent 30%,
+        rgba(99,102,241,0.045) 50%,
+        transparent 70%
+      );
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+      border-radius: inherit;
+    }
+    .process-card:hover::after {
+      opacity: 1;
+    }
+    .process-card:hover {
+      border-color: #c7d2fe !important;
+      box-shadow: 0 12px 40px rgba(99,102,241,0.13), 0 2px 8px rgba(99,102,241,0.06) !important;
+    }
+
+    /* Entrance slide-up for each card */
+    @keyframes cardEnter {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .process-card.card-visible {
+      animation: cardEnter 0.55s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .process-card.card-visible:nth-child(1) { animation-delay: 0ms; }
+    .process-card.card-visible:nth-child(2) { animation-delay: 80ms; }
+    .process-card.card-visible:nth-child(3) { animation-delay: 160ms; }
+    .process-card.card-visible:nth-child(4) { animation-delay: 240ms; }
+
+    /* Pulsing left accent on the top (active) card */
+    @keyframes accentPulse {
+      0%, 100% { opacity: 0.6; transform: scaleY(1); }
+      50%       { opacity: 1;   transform: scaleY(1.04); }
+    }
+    .process-card-active::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(to bottom, #4f46e5, #818cf8);
+      border-radius: 3px 0 0 3px;
+      animation: accentPulse 2.5s ease-in-out infinite;
+    }
+
     @media (max-width: 768px) {
       .hero-visual { display: none; }
       #cursor-glow { display: none; }
@@ -575,9 +633,7 @@
       </a>
       <div class="hidden md:flex items-center gap-8">
         <a href="#how-it-works" class="nav-link text-sm">How it works</a>
-        <a href="#features" class="nav-link text-sm">Features</a>
         <a href="#pricing" class="nav-link text-sm">Pricing</a>
-        <a href="#trust" class="nav-link text-sm">Why verify</a>
         <a href="#faq" class="nav-link text-sm">FAQ</a>
       </div>
       <div class="hidden md:flex items-center gap-3">
@@ -964,15 +1020,36 @@
     // ── Stacking cards — scale + dim buried cards ─────────────
     (function () {
       var cards = Array.prototype.slice.call(document.querySelectorAll('.process-card'));
-      var SCALE  = 0.025; // scale reduction per buried level
-      var DIM    = 0.06;  // brightness reduction per buried level
+      var SCALE  = 0.025;
+      var DIM    = 0.06;
+
+      // Entrance animation — trigger once when section scrolls into view
+      var section = document.getElementById('how-it-works');
+      var entered = false;
+      function checkEntrance() {
+        if (entered) return;
+        var rect = section.getBoundingClientRect();
+        if (rect.top < window.innerHeight * 0.85) {
+          entered = true;
+          cards.forEach(function (c) { c.classList.add('card-visible'); });
+        }
+      }
 
       function update() {
-        // Collect each card's current top offset from viewport
+        checkEntrance();
         var tops = cards.map(function (c) { return c.getBoundingClientRect().top; });
 
+        // Find the topmost stuck card (smallest top value near its sticky offset)
+        var activeIdx = -1;
+        var minTop = Infinity;
         cards.forEach(function (card, i) {
-          // Count how many later cards have scrolled up to overlap this one
+          var stickyTop = parseInt(card.style.top) || 80;
+          var diff = Math.abs(tops[i] - stickyTop);
+          if (diff < 8 && tops[i] < minTop) { minTop = tops[i]; activeIdx = i; }
+        });
+
+        cards.forEach(function (card, i) {
+          // Scale + dim buried cards
           var buried = 0;
           for (var j = i + 1; j < cards.length; j++) {
             if (tops[j] <= parseInt(card.style.top) + 32) buried++;
@@ -984,6 +1061,13 @@
           card.style.filter          = buried > 0 ? 'brightness(' + b + ')' : '';
           card.style.transition      = 'transform 0.4s cubic-bezier(0.22,1,0.36,1), filter 0.4s ease';
           card.style.zIndex          = i + 1;
+
+          // Active accent
+          if (i === activeIdx) {
+            card.classList.add('process-card-active');
+          } else {
+            card.classList.remove('process-card-active');
+          }
         });
       }
 
