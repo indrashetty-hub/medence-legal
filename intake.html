@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Start Your Verification — Medence Legal</title>
+  <meta name="description" content="Begin your property title verification with Medence Legal. A simple 3-step intake form." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Instrument Serif', 'serif'],
+          },
+          colors: {
+            brand: {
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: #ffffff;
+      color: #374151;
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .glass {
+      background: #ffffff;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      color: #111827;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 15px;
+      transition: all 0.2s ease;
+      border: 1px solid rgba(99,102,241,0.3);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #4338ca, #4f46e5);
+      box-shadow: 0 8px 30px rgba(99,102,241,0.35);
+      transform: translateY(-1px);
+    }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .form-input {
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: #111827;
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .form-input::placeholder { color: #9ca3af; }
+    .form-input:focus {
+      border-color: rgba(99,102,241,0.5);
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+    }
+    select.form-input option {
+      background: #ffffff;
+      color: #374151;
+    }
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: #94a3b8;
+      margin-bottom: 8px;
+      letter-spacing: 0.01em;
+    }
+    /* Progress indicator */
+    .step-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.4s cubic-bezier(0.22,1,0.36,1);
+      position: relative;
+      z-index: 1;
+    }
+    .step-circle.active {
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      color: #111827;
+      box-shadow: 0 0 20px rgba(99,102,241,0.4);
+    }
+    .step-circle.completed {
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      color: #111827;
+      box-shadow: 0 0 16px rgba(99,102,241,0.3);
+    }
+    .step-circle.inactive {
+      background: #f3f4f6;
+      border: 1px solid rgba(0,0,0,0.1);
+      color: #9ca3af;
+    }
+    .step-connector {
+      flex: 1;
+      height: 1px;
+      background: rgba(0,0,0,0.08);
+      position: relative;
+      overflow: hidden;
+    }
+    .step-connector-fill {
+      position: absolute;
+      top: 0; left: 0;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #4f46e5, #6366f1);
+      transition: width 0.5s cubic-bezier(0.22,1,0.36,1);
+    }
+    /* Property type cards */
+    .prop-card {
+      background: #ffffff;
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.22,1,0.36,1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      text-align: center;
+      user-select: none;
+    }
+    .prop-card:hover {
+      background: rgba(99,102,241,0.06);
+      border-color: rgba(99,102,241,0.25);
+    }
+    .prop-card.selected {
+      background: rgba(99,102,241,0.1);
+      border-color: rgba(99,102,241,0.5);
+      transform: scale(1.03);
+      box-shadow: 0 0 0 1px rgba(99,102,241,0.3), 0 8px 24px rgba(99,102,241,0.15);
+    }
+    /* Plan cards */
+    .plan-card {
+      background: #ffffff;
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 14px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.22,1,0.36,1);
+      position: relative;
+      user-select: none;
+    }
+    .plan-card:hover {
+      background: rgba(99,102,241,0.06);
+      border-color: rgba(99,102,241,0.25);
+    }
+    .plan-card.selected {
+      background: rgba(99,102,241,0.1);
+      border-color: rgba(99,102,241,0.5);
+      transform: scale(1.02);
+      box-shadow: 0 0 0 1px rgba(99,102,241,0.3), 0 8px 24px rgba(99,102,241,0.15);
+    }
+    .plan-card.recommended {
+      border-color: rgba(99,102,241,0.35);
+      background: rgba(99,102,241,0.06);
+    }
+    .plan-card.recommended.selected {
+      border-color: rgba(99,102,241,0.6);
+      background: rgba(99,102,241,0.12);
+    }
+    /* Step panels */
+    .step-panel {
+      display: none;
+      animation: slideInRight 0.35s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .step-panel.active { display: block; }
+    .step-panel.slide-out-left {
+      animation: slideOutLeft 0.3s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .step-panel.slide-in-right {
+      animation: slideInRight 0.35s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .step-panel.slide-out-right {
+      animation: slideOutRight 0.3s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .step-panel.slide-in-left {
+      animation: slideInLeft 0.35s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(32px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideOutLeft {
+      from { opacity: 1; transform: translateX(0); }
+      to   { opacity: 0; transform: translateX(-32px); }
+    }
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-32px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideOutRight {
+      from { opacity: 1; transform: translateX(0); }
+      to   { opacity: 0; transform: translateX(32px); }
+    }
+    /* Upload area */
+    .upload-area {
+      border: 1.5px dashed rgba(0,0,0,0.12);
+      border-radius: 12px;
+      padding: 36px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      background: #fafafa;
+    }
+    .upload-area:hover, .upload-area.drag-over {
+      border-color: rgba(99,102,241,0.4);
+      background: rgba(99,102,241,0.04);
+    }
+    /* Success screen */
+    #success-screen {
+      display: none;
+      animation: fadeInUp 0.6s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    #success-screen.visible { display: block; }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* Checkmark SVG animation */
+    .check-circle-path {
+      stroke-dasharray: 166;
+      stroke-dashoffset: 166;
+      animation: drawCircle 0.8s cubic-bezier(0.22,1,0.36,1) 0.2s forwards;
+    }
+    .check-tick-path {
+      stroke-dasharray: 48;
+      stroke-dashoffset: 48;
+      animation: drawTick 0.5s cubic-bezier(0.22,1,0.36,1) 0.9s forwards;
+    }
+    @keyframes drawCircle {
+      to { stroke-dashoffset: 0; }
+    }
+    @keyframes drawTick {
+      to { stroke-dashoffset: 0; }
+    }
+    /* Checkbox custom */
+    .custom-checkbox {
+      width: 18px;
+      height: 18px;
+      border-radius: 5px;
+      border: 1.5px solid rgba(255,255,255,0.15);
+      background: #f9fafb;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .custom-checkbox.checked {
+      background: #4f46e5;
+      border-color: #6366f1;
+    }
+    /* File chip */
+    .file-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(99,102,241,0.08);
+      border: 1px solid rgba(99,102,241,0.2);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+      color: #4f46e5;
+    }
+    /* Nav */
+    .nav-link-back {
+      color: #6b7280;
+      font-size: 14px;
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .nav-link-back:hover { color: #374151; }
+    /* Error state */
+    .form-input.error {
+      border-color: rgba(239,68,68,0.5);
+      box-shadow: 0 0 0 3px rgba(239,68,68,0.08);
+    }
+    .error-msg {
+      font-size: 12px;
+      color: #f87171;
+      margin-top: 5px;
+      display: none;
+    }
+    .error-msg.visible { display: block; }
+    /* Gradient text */
+    .gradient-text {
+      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    /* bg grid */
+    .bg-grid {
+      background-image:
+        linear-gradient(rgba(99,102,241,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99,102,241,0.05) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    @media (max-width: 640px) {
+      .plan-cards-grid { grid-template-columns: 1fr !important; }
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-700 font-sans bg-grid min-h-screen">
+
+  <!-- NAV -->
+  <nav class="fixed top-0 left-0 right-0 z-50 border-b border-gray-100" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M8 1L2 4v4c0 3.3 2.5 6.4 6 7 3.5-.6 6-3.7 6-7V4L8 1z" fill="white" opacity="0.9"/>
+          </svg>
+        </div>
+        <span class="font-semibold text-gray-900 text-[15px] tracking-tight">Medence <span class="text-indigo-600">Legal</span></span>
+      </a>
+      <a href="index.html" class="nav-link-back">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 12H5M12 5l-7 7 7 7"/>
+        </svg>
+        Back to home
+      </a>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="pt-24 pb-20 px-4">
+    <div class="max-w-[680px] mx-auto">
+
+      <!-- Page heading -->
+      <div class="text-center mb-10">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium uppercase tracking-widest mb-5" style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.2);color:#4f46e5;">
+          <svg width="8" height="8" viewBox="0 0 8 8" fill="#818cf8"><circle cx="4" cy="4" r="4"/></svg>
+          Property Verification
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight mb-3">
+          Start your <span class="font-serif italic gradient-text">verification</span>
+        </h1>
+        <p class="text-gray-500 text-base max-w-md mx-auto">
+          Takes about 3 minutes. No commitment required — we'll review your details and reach out to confirm.
+        </p>
+      </div>
+
+      <!-- Radial glow behind form -->
+      <div class="relative">
+        <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(99,102,241,0.06) 0%, transparent 70%); border-radius: 20px;"></div>
+
+        <!-- FORM CARD -->
+        <div id="form-card" style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:20px;padding:40px;position:relative;">
+
+          <!-- PROGRESS INDICATOR -->
+          <div class="mb-10">
+            <div class="flex items-center gap-0">
+              <!-- Step 1 -->
+              <div class="flex flex-col items-center gap-2">
+                <div id="step-circle-1" class="step-circle active">1</div>
+                <span id="step-label-1" class="text-xs font-medium" style="color:#818cf8;">Property</span>
+              </div>
+              <!-- Connector 1-2 -->
+              <div class="step-connector mx-2 mb-5">
+                <div id="connector-1" class="step-connector-fill"></div>
+              </div>
+              <!-- Step 2 -->
+              <div class="flex flex-col items-center gap-2">
+                <div id="step-circle-2" class="step-circle inactive">2</div>
+                <span id="step-label-2" class="text-xs font-medium text-gray-400">Documents</span>
+              </div>
+              <!-- Connector 2-3 -->
+              <div class="step-connector mx-2 mb-5">
+                <div id="connector-2" class="step-connector-fill"></div>
+              </div>
+              <!-- Step 3 -->
+              <div class="flex flex-col items-center gap-2">
+                <div id="step-circle-3" class="step-circle inactive">3</div>
+                <span id="step-label-3" class="text-xs font-medium text-gray-400">Your details</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP PANELS WRAPPER -->
+          <div id="steps-wrapper" style="overflow:hidden;">
+
